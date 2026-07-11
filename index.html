@@ -1,50 +1,394 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hacker Portfolio</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Harman – Portfolio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.cdnfonts.com/css/satoshi" rel="stylesheet" />
+  <style>
+    body { font-family: 'Satoshi', sans-serif; }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Hacker Portfolio</h1>
-  </header>
+  <div id="root"></div>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/framer-motion/dist/framer-motion.js"></script>
 
-  <section id="about">
-    <h2>About Me</h2>
-    <p>Passionate about cybersecurity and ethical hacking. Always learning new things...</p>
-  </section>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    const { motion, AnimatePresence } = window['framer-motion'];
 
-  <section id="skills">
-    <h2>Skills</h2>
-    <ul>
-      <li>Penetration Testing</li>
-      <li>Web Security</li>
-      <li>CTF Competitions</li>
-      <li>Linux</li>
-      <li>Programming</li>
-    </ul>
-  </section>
+    // ---------- Icons ----------
+    const menuIcon = (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    );
+    const closeIcon = (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    );
 
-  <section id="projects">
-    <h2>Projects</h2>
-    <ul>
-      <li><a href="#">CTF Writeup</a></li>
-      <li><a href="#">Bug Bounty Report</a></li>
-    </ul>
-  </section>
+    // ---------- Data ----------
+    const navItems = ['Home', 'About', 'Projects', 'Testimonials', 'Contact'];
 
-  <section id="blog">
-    <h2>Blog</h2>
-    <p>Latest learning and hacking adventures...</p>
-  </section>
+    const projects = [
+      { id: 1, title: 'Crypto Dashboard', category: 'web', image: 'https://placehold.co/600x400/374151/ffffff?text=Crypto', desc: 'Real‑time crypto tracker with charts.' },
+      { id: 2, title: 'E‑Commerce UI', category: 'ui', image: 'https://placehold.co/600x400/4c1d95/ffffff?text=Shop', desc: 'Clean, animated product pages.' },
+      { id: 3, title: 'AI Chatbot', category: 'web', image: 'https://placehold.co/600x400/065f46/ffffff?text=Chatbot', desc: 'GPT‑powered customer support bot.' },
+      { id: 4, title: 'Brand Identity', category: 'branding', image: 'https://placehold.co/600x400/7c3aed/ffffff?text=Brand', desc: 'Full brand kit for a startup.' },
+      { id: 5, title: 'Portfolio Template', category: 'ui', image: 'https://placehold.co/600x400/1e3a5f/ffffff?text=Portfolio', desc: 'Animated Next.js portfolio.' },
+      { id: 6, title: 'Mobile App', category: 'mobile', image: 'https://placehold.co/600x400/9d174d/ffffff?text=App', desc: 'Fitness tracker with smooth transitions.' },
+    ];
+    const categories = ['All', 'Web', 'UI', 'Branding', 'Mobile'];
 
-  <section id="contact">
-    <h2>Contact</h2>
-    <p>Email: <a href="mailto:you@example.com">you@example.com</a></p>
-  </section>
+    const testimonials = [
+      { name: 'Sarah K.', role: 'Product Manager', text: 'Harman is incredibly talented – his animations are next‑level for a 19‑year‑old!' },
+      { name: 'James L.', role: 'CTO, TechCorp', text: 'Young but brilliant. Harman’s attention to detail blows me away.' },
+      { name: 'Mia W.', role: 'Design Lead', text: 'At 19, he already thinks like a pro. Highly recommend.' },
+    ];
 
-  <script src="script.js"></script>
+    const skills = [
+      { name: 'React / Next.js', level: 88 },
+      { name: 'Framer Motion', level: 85 },
+      { name: 'Tailwind CSS', level: 92 },
+      { name: 'UI/UX Design', level: 80 },
+      { name: 'Creative Problem Solving', level: 90 },
+    ];
+
+    // ---------- Helper ----------
+    function useReducedMotion() {
+      const [prefersReduced, setPrefersReduced] = useState(false);
+      useEffect(() => {
+        const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+        setPrefersReduced(mq.matches);
+        const handler = (e) => setPrefersReduced(e.matches);
+        mq.addEventListener('change', handler);
+        return () => mq.removeEventListener('change', handler);
+      }, []);
+      return prefersReduced;
+    }
+
+    // ---------- Reusable Components ----------
+    function Button({ variant = 'primary', children, className, onClick }) {
+      const base = 'px-6 py-2 rounded-xl font-medium transition-all duration-200 shadow-sm';
+      const variants = {
+        primary: 'bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:shadow-lg hover:shadow-pink-500/40 active:scale-95',
+        outline: 'border border-white/30 text-white hover:bg-white/10',
+        ghost: 'text-gray-300 hover:text-white',
+      };
+      return (
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.95 }}
+          className={`${base} ${variants[variant]} ${className || ''}`}
+          onClick={onClick}
+        >
+          {children}
+        </motion.button>
+      );
+    }
+
+    function Card({ children, className }) {
+      return (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+          className={`bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl ${className || ''}`}
+        >
+          {children}
+        </motion.div>
+      );
+    }
+
+    function GlowInput({ placeholder, type = 'text' }) {
+      return (
+        <input
+          type={type}
+          placeholder={placeholder}
+          className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-400 transition"
+        />
+      );
+    }
+
+    // ---------- Main App ----------
+    function App() {
+      const [menuOpen, setMenuOpen] = useState(false);
+      const [activeFilter, setActiveFilter] = useState('All');
+      const [currentTestimonial, setCurrentTestimonial] = useState(0);
+      const reducedMotion = useReducedMotion();
+
+      const scrollTo = (id) => {
+        const section = document.getElementById(id);
+        if (section) section.scrollIntoView({ behavior: 'smooth' });
+        setMenuOpen(false);
+      };
+
+      const filteredProjects = activeFilter === 'All'
+        ? projects
+        : projects.filter(p => p.category.toLowerCase() === activeFilter.toLowerCase());
+
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900 text-white overflow-x-hidden">
+          {/* NAVIGATION */}
+          <motion.nav
+            initial={{ y: -100 }}
+            animate={{ y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="fixed top-0 left-0 w-full z-50 backdrop-blur-lg bg-black/30 border-b border-white/10"
+          >
+            <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
+              <span className="text-2xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
+                Harman
+              </span>
+              <div className="hidden md:flex gap-8">
+                {navItems.map(item => (
+                  <button key={item} onClick={() => scrollTo(item.toLowerCase())} className="text-gray-300 hover:text-white transition-colors relative group">
+                    {item}
+                    <span className="block h-0.5 bg-pink-400 scale-x-0 group-hover:scale-x-100 transition-transform absolute bottom-0 left-0 w-full" />
+                  </button>
+                ))}
+              </div>
+              <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden p-2">
+                {menuOpen ? closeIcon : menuIcon}
+              </button>
+            </div>
+            <AnimatePresence>
+              {menuOpen && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="md:hidden overflow-hidden bg-black/60 backdrop-blur-md"
+                >
+                  <div className="flex flex-col items-center gap-4 py-6">
+                    {navItems.map(item => (
+                      <button key={item} onClick={() => scrollTo(item.toLowerCase())} className="text-gray-200 hover:text-white text-lg">{item}</button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.nav>
+
+          {/* HERO */}
+          <section id="home" className="min-h-screen flex flex-col items-center justify-center px-4 pt-20">
+            <motion.div
+              initial={reducedMotion ? { opacity: 1 } : { opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6 }}
+            >
+              <div className="w-28 h-28 rounded-full bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 flex items-center justify-center text-5xl font-bold shadow-2xl shadow-purple-500/50 mb-8">
+                H
+              </div>
+            </motion.div>
+            <motion.h1
+              initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="text-5xl md:text-7xl font-bold text-center"
+            >
+              Hi, I'm{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400">
+                Harman
+              </span>
+            </motion.h1>
+            <motion.p
+              initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+              className="text-lg md:text-xl text-gray-300 max-w-2xl text-center mt-4 mb-8"
+            >
+              19 years old • Frontend developer • Animation enthusiast
+            </motion.p>
+            <motion.div
+              initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+              className="flex gap-4"
+            >
+              <Button variant="primary" onClick={() => scrollTo('projects')}>See My Work</Button>
+              <Button variant="outline" onClick={() => scrollTo('contact')}>Get in Touch</Button>
+            </motion.div>
+            <motion.div animate={{ y: [0, 10, 0] }} transition={{ repeat: Infinity, duration: 2 }} className="mt-16">
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-50">
+                <path d="M7 13l5 5 5-5M7 6l5 5 5-5"/>
+              </svg>
+            </motion.div>
+          </section>
+
+          {/* ABOUT */}
+          <section id="about" className="py-24 px-4 max-w-6xl mx-auto">
+            <motion.h2
+              initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-4xl font-bold text-center mb-16"
+            >
+              About Me
+            </motion.h2>
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <Card className="p-8">
+                <p className="text-gray-200 text-lg leading-relaxed">
+                  I'm a 19‑year‑old self‑taught developer with a passion for crafting animated, high‑performance web experiences. 
+                  I started coding at 15 and fell in love with Framer Motion. Every line of code I write aims to delight the user.
+                </p>
+              </Card>
+              <div className="space-y-4">
+                {skills.map((skill, i) => (
+                  <div key={skill.name}>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>{skill.name}</span>
+                      <span>{skill.level}%</span>
+                    </div>
+                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                      <motion.div
+                        className="h-full bg-gradient-to-r from-pink-400 to-purple-500 rounded-full"
+                        initial={{ width: 0 }}
+                        whileInView={{ width: `${skill.level}%` }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1, delay: i * 0.15 }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* PROJECTS */}
+          <section id="projects" className="py-24 px-4 max-w-6xl mx-auto">
+            <motion.h2
+              initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-4xl font-bold text-center mb-4"
+            >
+              Projects
+            </motion.h2>
+            <p className="text-gray-400 text-center mb-8">Filter by category</p>
+            <div className="flex justify-center gap-3 mb-12 flex-wrap">
+              {categories.map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveFilter(cat)}
+                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                    activeFilter === cat
+                      ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg'
+                      : 'border border-white/30 text-white hover:bg-white/10'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+            <div className="grid md:grid-cols-3 gap-6">
+              <AnimatePresence mode="popLayout">
+                {filteredProjects.map((project, i) => (
+                  <motion.div
+                    key={project.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.4, delay: i * 0.05 }}
+                    whileHover={{ y: -8 }}
+                  >
+                    <Card className="p-0 overflow-hidden h-full">
+                      <img src={project.image} alt={project.title} className="w-full h-48 object-cover" />
+                      <div className="p-5">
+                        <h3 className="text-xl font-semibold mb-2">{project.title}</h3>
+                        <p className="text-gray-400 text-sm">{project.desc}</p>
+                        <Button variant="ghost" className="mt-3">View Project →</Button>
+                      </div>
+                    </Card>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          </section>
+
+          {/* TESTIMONIALS */}
+          <section id="testimonials" className="py-24 px-4 max-w-4xl mx-auto">
+            <motion.h2
+              initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-4xl font-bold text-center mb-16"
+            >
+              What People Say
+            </motion.h2>
+            <div className="relative">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentTestimonial}
+                  initial={{ opacity: 0, x: 50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -50 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <Card className="p-8 text-center">
+                    <p className="text-lg italic mb-6">"{testimonials[currentTestimonial].text}"</p>
+                    <p className="font-semibold">{testimonials[currentTestimonial].name}</p>
+                    <p className="text-gray-400 text-sm">{testimonials[currentTestimonial].role}</p>
+                  </Card>
+                </motion.div>
+              </AnimatePresence>
+              <div className="flex justify-center gap-4 mt-6">
+                <button
+                  onClick={() => setCurrentTestimonial(prev => (prev === 0 ? testimonials.length - 1 : prev - 1))}
+                  className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition"
+                >
+                  ←
+                </button>
+                <button
+                  onClick={() => setCurrentTestimonial(prev => (prev === testimonials.length - 1 ? 0 : prev + 1))}
+                  className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition"
+                >
+                  →
+                </button>
+              </div>
+            </div>
+          </section>
+
+          {/* CONTACT */}
+          <section id="contact" className="py-24 px-4 max-w-2xl mx-auto">
+            <motion.h2
+              initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-4xl font-bold text-center mb-4"
+            >
+              Get in Touch
+            </motion.h2>
+            <p className="text-gray-400 text-center mb-12">Got a project? Let's build something cool together.</p>
+            <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
+              <GlowInput placeholder="Your name" />
+              <GlowInput type="email" placeholder="your@email.com" />
+              <textarea
+                placeholder="Your message"
+                rows="4"
+                className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-400 transition resize-none"
+              />
+              <Button variant="primary" className="w-full py-3 text-lg">Send Message</Button>
+            </form>
+          </section>
+
+          {/* FOOTER */}
+          <footer className="py-8 border-t border-white/10 text-center text-gray-500 text-sm">
+            <p>© 2025 Harman • 19 • Built with React + Framer Motion + Tailwind</p>
+          </footer>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
 </body>
 </html>
